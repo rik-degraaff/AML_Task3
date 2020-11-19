@@ -17,7 +17,7 @@ X_train, y_train, X_test = import_data(None)
 #print((X_train.iloc[3029,:]))
 
 print("test")
-ts=X_train.iloc[3000,:]
+ts=X_train.iloc[4448,:]
 print(ts.shape)
 print(ts.index)
 ts_new=ts[ts.notna()]
@@ -25,7 +25,7 @@ print(ts_new.shape)
 print(ts_new.index)
 
 
-ts,f_signal,rpeaks,templates_ts,templates,heart_rate_ts,heart_rate=ecg.ecg(signal=ts_new, sampling_rate=300.0, show=False)
+ts,f_signal,rpeaks,templates_ts,templates,heart_rate_ts,heart_rate=ecg.ecg(signal=ts_new, sampling_rate=300.0, show=True)
 print("ts")
 print(ts)
 print("----")

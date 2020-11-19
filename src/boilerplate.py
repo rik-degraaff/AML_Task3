@@ -7,7 +7,7 @@ from sklearn.model_selection import StratifiedKFold, GridSearchCV, train_test_sp
 from sklearn.metrics import balanced_accuracy_score
 from imblearn.pipeline import Pipeline
 
-from .utils import path_project
+from utils import path_project
 
 
 def import_data(subfolder=None):
@@ -22,8 +22,8 @@ def import_data(subfolder=None):
         path_y_train = path_project + 'data/raw_data/y_train.csv'
 
     # import the files as panda data frames
-    X_train = pd.read_csv(path_X_train, sep=',', index_col=0)
-    X_test = pd.read_csv(path_X_test, sep=',', index_col=0)
+    X_train = pd.read_csv(path_X_train, sep=',', index_col=0, low_memory=False)
+    X_test = pd.read_csv(path_X_test, sep=',', index_col=0, low_memory=False)
     y_train = pd.read_csv(path_y_train, sep=',', index_col=0)
 
     return X_train, y_train, X_test
