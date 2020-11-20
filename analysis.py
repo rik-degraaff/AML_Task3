@@ -1,8 +1,8 @@
 import os
 import pandas as pd
 import biosppy.signals.ecg as ecg
-from utils import path_project
-from boilerplate import import_data
+from src.utils import path_project
+from src.boilerplate import import_data
 
 
 X_train, y_train, X_test = import_data(None)
@@ -25,7 +25,7 @@ print(ts_new.shape)
 print(ts_new.index)
 
 
-ts,f_signal,rpeaks,templates_ts,templates,heart_rate_ts,heart_rate=ecg.ecg(signal=ts_new, sampling_rate=300.0, show=True)
+ts,f_signal,rpeaks,templates_ts,templates,heart_rate_ts,heart_rate=ecg.ecg(signal=ts_new, sampling_rate=300.0, show=False)
 print("ts")
 print(ts)
 print("----")

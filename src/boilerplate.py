@@ -7,7 +7,7 @@ from sklearn.model_selection import StratifiedKFold, GridSearchCV, train_test_sp
 from sklearn.metrics import balanced_accuracy_score
 from imblearn.pipeline import Pipeline
 
-from utils import path_project
+from .utils import path_project
 
 
 def import_data(subfolder=None):
