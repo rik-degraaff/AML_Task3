@@ -10,6 +10,7 @@ def test2(out):
      return [3, 4, 5]
 
 
-X_train_processed, y_train_processed, X_test_processed = preprocess_heartbeats([test1, test2])(X_train.iloc[:2,:], y_train, X_test.iloc[:2,:])
+X_train_processed, y_train_processed, X_test_processed = preprocess_heartbeats([test1, test2])(X_train, y_train, X_test)
 print(X_train_processed)
+print()
 print(X_test_processed)
