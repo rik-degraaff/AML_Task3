@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.preprocess.heartbeat_processor import preprocess_heartbeats
+from src.feature_extraction.heartbeat_feature_extractors import extract_all_features
 from src.boilerplate import import_data
 
 X_train, y_train, X_test = import_data()
@@ -28,7 +28,8 @@ def fft(heartbeat):
     plt.plot(freq, sp.real/length, freq, sp.imag/length)
     plt.show()
 
-X_train_processed, y_train_processed, X_test_processed = preprocess_heartbeats([fft])(X_train, y_train, X_test)
+X_train_processed, y_train_processed, X_test_processed = extract_all_features([test1, test2, fft])(X_train, y_train, X_test)
+
 print(X_train_processed)
 print()
 print(X_test_processed)

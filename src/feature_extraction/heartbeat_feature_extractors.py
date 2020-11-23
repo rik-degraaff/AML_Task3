@@ -7,6 +7,7 @@ import sys
 from biosppy.signals import ecg
 
 from ..utils import path_project
+from .feature_extractor import extract_features
 
 class Heartbeat:
     def __init__(self, out):
@@ -18,7 +19,11 @@ class Heartbeat:
         self.heart_rate_ts = out['heart_rate_ts']
         self.heart_rate = out['heart_rate']
 
-def preprocess_heartbeats(feature_extractors):
+def extract_all_features(feature_extractors):
+    extract_heartbeats = extract_heartbeat_features([feature_extractors])
+    return extract_features([extract_heartbeats])
+
+def extract_heartbeat_features(feature_extractors):
     def aux(X_train, X_test):
         train_heartbeats, train_df, test_heartbeats, test_df = get_heartbeats(X_train, X_test)
 
@@ -55,7 +60,7 @@ def calc_heartbeats(df):
     bounds = pd.DataFrame()
     for index, row in df.iterrows():
         heartbeat = row[row.notna()]
-        factors = factors.append(pd.DataFrame([[np.min(heartbeat), np.max(heartbeat)]]))
+        bounds = bounds.append(pd.DataFrame([[np.min(heartbeat), np.max(heartbeat)]]))
         heartbeat = (heartbeat - np.min(heartbeat))/(np.max(heartbeat) - np.min(heartbeat))
         heartbeats.append(Heartbeat(ecg.ecg(heartbeat, sampling_rate=300., show=False)))
     return heartbeats, bounds
