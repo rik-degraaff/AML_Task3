@@ -20,7 +20,7 @@ class Heartbeat:
         self.heart_rate = out['heart_rate']
 
 def extract_all_features(feature_extractors):
-    extract_heartbeats = extract_heartbeat_features([feature_extractors])
+    extract_heartbeats = extract_heartbeat_features(feature_extractors)
     return extract_features([extract_heartbeats])
 
 def extract_heartbeat_features(feature_extractors):
