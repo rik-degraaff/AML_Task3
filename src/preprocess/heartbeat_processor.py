@@ -1,10 +1,21 @@
 import pandas as pd
 import pickle
 import os
+import sys
 
 from biosppy.signals import ecg
 
 from ..utils import path_project
+
+class Heartbeat:
+    def __init__(self, out):
+        self.ts = out['ts']
+        self.filtered = out['filtered']
+        self.rpeaks = out['rpeaks']
+        self.templates_ts = out['templates_ts']
+        self.templates = out['templates']
+        self.heart_rate_ts = out['heart_rate_ts']
+        self.heart_rate = out['heart_rate']
 
 def preprocess_heartbeats(feature_extractors):
     def aux(X_train, y_train, X_test):
@@ -23,7 +34,7 @@ def preprocess_heartbeats(feature_extractors):
 def get_heartbeats(X_train, X_test):
     path = path_project + "data/raw_data/heartbeats/"
     os.makedirs(path, exist_ok=True)
-    
+
     train_path = path + "train.sav"
     if os.path.isfile(train_path) and os.access(train_path, os.R_OK):
         train_heartbeats = pickle.load(open(train_path, "rb"))
@@ -44,7 +55,7 @@ def calc_heartbeats(df):
     heartbeats = []
     for index, row in df.iterrows():
         heartbeat = row[row.notna()]
-        heartbeats.append(ecg.ecg(heartbeat, sampling_rate=300., show=False))
+        heartbeats.append(Heartbeat(ecg.ecg(heartbeat, sampling_rate=300., show=False)))
     return heartbeats
 
 def extract(heartbeats, feature_extractor):
