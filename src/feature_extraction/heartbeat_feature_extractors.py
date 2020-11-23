@@ -27,6 +27,9 @@ def extract_heartbeat_features(feature_extractors):
     def aux(X_train, X_test):
         train_heartbeats, train_df, test_heartbeats, test_df = get_heartbeats(X_train, X_test)
 
+        print(train_df)
+        print(test_df)
+
         for extractor in feature_extractors:
             train_df = pd.concat([train_df, extract(train_heartbeats, extractor)], axis=1)
             test_df = pd.concat([test_df, extract(test_heartbeats, extractor)], axis=1)
@@ -60,7 +63,7 @@ def calc_heartbeats(df):
     bounds = pd.DataFrame()
     for index, row in df.iterrows():
         heartbeat = row[row.notna()]
-        bounds = bounds.append(pd.DataFrame([[np.min(heartbeat), np.max(heartbeat)]]))
+        bounds = bounds.append(pd.DataFrame([[np.min(heartbeat), np.max(heartbeat)]]), ignore_index=True)
         heartbeat = (heartbeat - np.min(heartbeat))/(np.max(heartbeat) - np.min(heartbeat))
         heartbeats.append(Heartbeat(ecg.ecg(heartbeat, sampling_rate=300., show=False)))
     return heartbeats, bounds
@@ -71,5 +74,6 @@ def extract(heartbeats, feature_extractor):
         features = feature_extractor(heartbeat)
         df = df.append(pd.DataFrame([features]), ignore_index=True)
 
+    print(df)
     return df
 
