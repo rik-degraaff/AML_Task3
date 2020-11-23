@@ -138,6 +138,6 @@ dmypy.json
 src/score_log/*
 src/predictions/*
 /results.csv
-src/data/raw_data/*
+src/data/*
 #PyCharm
 .idea
