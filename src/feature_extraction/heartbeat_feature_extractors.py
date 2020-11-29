@@ -28,14 +28,14 @@ def extract_all_features(feature_extractors, ts_feature_extractors):
     return extract_features([extract_heartbeats])
 
 def min_max_scale(train_df, test_df, columns=True):
-    all_features = pd.concat([train_df, train_df], axis=0)
+    all_features = pd.concat([train_df, test_df], axis=0)
     if columns:
         scaler = MinMaxScaler()
         scaler.fit(all_features)
         return pd.DataFrame(scaler.transform(train_df)), pd.DataFrame(scaler.transform(test_df))
     
-    min_val = all_features.min()
-    max_val = all_features.max()
+    min_val = all_features.min().min()
+    max_val = all_features.max().max()
     return (train_df - min_val)/(max_val - min_val), (test_df - min_val)/(max_val - min_val)
 
 def extract_heartbeat_features(feature_extractors, ts_feature_extractors):
@@ -50,11 +50,35 @@ def extract_heartbeat_features(feature_extractors, ts_feature_extractors):
             train_df = pd.concat([train_df, train_features], axis=1, ignore_index=True)
             test_df = pd.concat([test_df, test_features], axis=1, ignore_index=True)
 
+            print('train min:', train_features.min().min())
+            print('train max:', train_features.max().max())
+
+            print('test min:', test_features.min().min())
+            print('test max:', test_features.max().max())
+
+            print('global train min:', train_df.min().min())
+            print('global train max:', train_df.max().max())
+
+            print('global test min:', test_df.min().min())
+            print('global test max:', test_df.max().max())
+
         for extractor in ts_feature_extractors:
             train_features, test_features = min_max_scale(extract(train_heartbeats, extractor), extract(test_heartbeats, extractor), columns=False)
 
             train_df = pd.concat([train_df, train_features], axis=1, ignore_index=True)
             test_df = pd.concat([test_df, test_features], axis=1, ignore_index=True)
+
+            print('train min:', train_features.min().min())
+            print('train max:', train_features.max().max())
+
+            print('test min:', test_features.min().min())
+            print('test max:', test_features.max().max())
+
+            print('global train min:', train_df.min().min())
+            print('global train max:', train_df.max().max())
+
+            print('global test min:', test_df.min().min())
+            print('global test max:', test_df.max().max())
         
         return train_df, test_df
 

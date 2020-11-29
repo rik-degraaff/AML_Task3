@@ -24,7 +24,7 @@ def preprocess_ecg_data_convolutional_autoencoder(X_train, y_train, X_test):
     X_train, y_train, X_test = extractor(X_train, y_train, X_test)
     print(X_train)
     print(X_test)
-    autoencode = ConvAutoEncodePreprocessor(4, 50, len(X_train.columns) - 4*180, 200)
+    autoencode = ConvAutoEncodePreprocessor(4, 50, len(X_train.columns) - 4*180, 250)
     return autoencode(X_train, y_train, X_test)
 
 main(name=os.path.basename(__file__), model=model, preprocess=preprocess_ecg_data_convolutional_autoencoder, get_score=True, save_model=True)

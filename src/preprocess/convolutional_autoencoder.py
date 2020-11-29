@@ -108,7 +108,7 @@ class ConvAutoEncoder(Module):
 class ConvAutoEncodePreprocessor:
     def __init__(self, channels, n_features, n_non_conv, n_epochs):
         self.model = ConvAutoEncoder(channels, n_features, n_non_conv)
-        self.criterion = SmoothL1Loss()
+        self.criterion = SmoothL1Loss(beta=0.1)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
         if torch.cuda.is_available():
             self.device = 'cuda:0'
