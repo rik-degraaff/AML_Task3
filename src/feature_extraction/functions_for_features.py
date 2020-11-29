@@ -102,3 +102,6 @@ def extract_template_stats_var_coeff(ecg):
 def extract_template_stats_skew(ecg):
     return sp.stats.skew(ecg.templates, axis=0)
 
+def extract_template_stats_kurtosis(ecg):
+    return sp.stats.kurtosis(ecg.templates, axis=0)
+
