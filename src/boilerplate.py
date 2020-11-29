@@ -4,7 +4,7 @@ import pickle
 import os
 
 from sklearn.model_selection import StratifiedKFold, GridSearchCV, train_test_split
-from sklearn.metrics import balanced_accuracy_score
+from sklearn.metrics import balanced_accuracy_score, f1_score
 from imblearn.pipeline import Pipeline
 
 from .utils import path_project
@@ -126,7 +126,8 @@ def main(name, model, preprocess=None, get_pred=True, get_score=True, cv_splits=
                 if isinstance(model, GridSearchCV):
                     print(model.best_params_)
                 y_pred_cv = model.predict(X_test_cv)
-                cv_score = balanced_accuracy_score(y_test_cv, y_pred_cv)
+                #cv_score = balanced_accuracy_score(y_test_cv, y_pred_cv)
+                cv_score = f1_score(y_test_cv, y_pred_cv, average='micro')
                 cv_scores.append(cv_score)
                 print(f"cv_scores: {cv_scores}")
 
@@ -151,7 +152,7 @@ def main(name, model, preprocess=None, get_pred=True, get_score=True, cv_splits=
 
             model.fit(X_train_split, y_train_split.values.ravel())
             y_pred_split = model.predict(X_test_split)
-            score = balanced_accuracy_score(y_test_split, y_pred_split)
+            score = f1_score(y_test_split, y_pred_split, average='micro')
 
             result_entry["test_score"] = score
             
