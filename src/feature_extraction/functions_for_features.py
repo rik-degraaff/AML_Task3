@@ -14,6 +14,7 @@ def extract_heart_rate_features(ecg):
     if (len(ecg.heart_rate)) >= 1:
         mean_heart_rate = np.mean(ecg.heart_rate)
         median_heart_rate = np.median(ecg.heart_rate)
+        mean_median_ratio = (mean_heart_rate - median_heart_rate) / (mean_heart_rate+0.0000000000001)
         std_heart_rate = np.std(ecg.heart_rate)
         var_coefficient = (std_heart_rate / (mean_heart_rate+0.00000000001)) * 100
 
@@ -31,11 +32,10 @@ def extract_heart_rate_features(ecg):
         RMSSD = np.sqrt(RMS / (len(ecg.heart_rate)))
 
     else:
-        mean_heart_rate, median_heart_rate, std_heart_rate, var_coefficient, vol_heart_rate, skew_heart_rate = heart_rate_derived_from_peaks(ecg)
+        mean_heart_rate, median_heart_rate, mean_median_ratio, std_heart_rate, var_coefficient, vol_heart_rate, skew_heart_rate = heart_rate_derived_from_peaks(ecg)
         RMSSD = extract_heart_rate_variability_peaks(ecg)
 
-    return mean_heart_rate, median_heart_rate, (
-                mean_heart_rate - median_heart_rate) / (mean_heart_rate+0.0000000000001), std_heart_rate, var_coefficient, vol_heart_rate, skew_heart_rate, RMSSD
+    return mean_heart_rate, median_heart_rate, mean_median_ratio, std_heart_rate, var_coefficient, vol_heart_rate, skew_heart_rate, RMSSD
 
     # returns mean, median, (mean-median)/mean, std, varcoeff, skewness, RMSSD
 
@@ -72,6 +72,7 @@ def heart_rate_derived_from_peaks(ecg):
 
     mean_heart_rate_peaks = np.mean(heart_rate_peaks)
     median_heart_rate_peaks = np.median(heart_rate_peaks)
+    mean_median_ratio_peaks = (mean_heart_rate_peaks - median_heart_rate_peaks) / (mean_heart_rate_peaks + 0.0000000000001)
     std_heart_rate_peaks = np.std(heart_rate_peaks)
     var_coefficient_peaks = (std_heart_rate_peaks / (mean_heart_rate_peaks+0.00000000001)) * 100
     chg_heart_rate_peaks = []
@@ -79,9 +80,9 @@ def heart_rate_derived_from_peaks(ecg):
         chg_heart_rate_peaks = np.append(chg_heart_rate_peaks, heart_rate_peaks[i + 1] / heart_rate_peaks[i] - 1)
     vol_heart_rate_peaks = np.std(heart_rate_peaks)
     skew_heart_rate_peaks = sp.stats.skew(heart_rate_peaks)
-    return mean_heart_rate_peaks, median_heart_rate_peaks, std_heart_rate_peaks, var_coefficient_peaks, vol_heart_rate_peaks, skew_heart_rate_peaks
+    return mean_heart_rate_peaks, median_heart_rate_peaks, mean_median_ratio_peaks, std_heart_rate_peaks, var_coefficient_peaks, vol_heart_rate_peaks, skew_heart_rate_peaks
 
-    #mean_heart_rate, median_heart_rate, std_heart_rate, var_coefficient, vol_heart_rate, skew_heart_rate
+    #mean_heart_rate, median_heart_rate, mean_median_ratio, std_heart_rate, var_coefficient, vol_heart_rate, skew_heart_rate
 
 def extract_template_stats_all(ecg):
     return np.concatenate((np.mean(ecg.templates, axis=0), np.median(ecg.templates, axis=0),(np.mean(ecg.templates, axis=0) - np.median(ecg.templates, axis=0)) / (np.mean(ecg.templates, axis=0) + 0.000000000001), np.std(ecg.templates, axis=0), 100 * (np.std(ecg.templates, axis=0) / (np.mean(ecg.templates, axis=0) + 0.000000000001)), sp.stats.skew(ecg.templates, axis=0)), axis=0)
