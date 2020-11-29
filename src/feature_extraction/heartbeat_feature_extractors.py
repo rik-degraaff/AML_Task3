@@ -23,11 +23,14 @@ class Heartbeat:
         self.heart_rate_ts = out['heart_rate_ts']
         self.heart_rate = out['heart_rate']
 
-def extract_all_features(feature_extractors, ts_feature_extractors):
-    extract_heartbeats = extract_heartbeat_features(feature_extractors, ts_feature_extractors)
+def extract_all_features(feature_extractors, ts_feature_extractors=[], scale=False):
+    extract_heartbeats = extract_heartbeat_features(feature_extractors, ts_feature_extractors, scale)
     return extract_features([extract_heartbeats])
 
-def min_max_scale(train_df, test_df, columns=True):
+def min_max_scale(train_df, test_df, scale, columns=True):
+    if not scale:
+        return train_df, test_df
+
     all_features = pd.concat([train_df, test_df], axis=0)
     if columns:
         scaler = MinMaxScaler()
@@ -38,14 +41,14 @@ def min_max_scale(train_df, test_df, columns=True):
     max_val = all_features.max().max()
     return (train_df - min_val)/(max_val - min_val), (test_df - min_val)/(max_val - min_val)
 
-def extract_heartbeat_features(feature_extractors, ts_feature_extractors):
+def extract_heartbeat_features(feature_extractors, ts_feature_extractors, scale):
     def aux(X_train, X_test):
         train_heartbeats, train_df, test_heartbeats, test_df = get_heartbeats(X_train, X_test)
 
-        train_df, test_df = min_max_scale(train_df, test_df)
+        train_df, test_df = min_max_scale(train_df, test_df, scale)
 
         for extractor in feature_extractors:
-            train_features, test_features = min_max_scale(extract(train_heartbeats, extractor), extract(test_heartbeats, extractor))
+            train_features, test_features = min_max_scale(extract(train_heartbeats, extractor), extract(test_heartbeats, extractor), scale)
 
             train_df = pd.concat([train_df, train_features], axis=1, ignore_index=True)
             test_df = pd.concat([test_df, test_features], axis=1, ignore_index=True)
@@ -63,7 +66,7 @@ def extract_heartbeat_features(feature_extractors, ts_feature_extractors):
             print('global test max:', test_df.max().max())
 
         for extractor in ts_feature_extractors:
-            train_features, test_features = min_max_scale(extract(train_heartbeats, extractor), extract(test_heartbeats, extractor), columns=False)
+            train_features, test_features = min_max_scale(extract(train_heartbeats, extractor), extract(test_heartbeats, extractor), scale, columns=False)
 
             train_df = pd.concat([train_df, train_features], axis=1, ignore_index=True)
             test_df = pd.concat([test_df, test_features], axis=1, ignore_index=True)

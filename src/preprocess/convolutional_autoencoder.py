@@ -135,7 +135,11 @@ class ConvAutoEncodePreprocessor:
                 data.to(self.device)
                 self.optimizer.zero_grad()
                 pred = self.model(data)
-                loss = self.criterion(pred, data)
+                smoothl1_loss = self.criterion(pred, data)
+                diff = torch.abs(pred - data)
+                softmax_diff = diff.softmax(1)
+                softmax_loss = softmax_diff.mean()
+                loss = smoothl1_loss + softmax_loss
                 train_loss += loss.item() * data.size(0)
                 loss.backward()
                 self.optimizer.step()

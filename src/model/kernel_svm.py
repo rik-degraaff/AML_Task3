@@ -8,7 +8,7 @@ def give_model():
     param_grid = {
         'kernel': ['rbf'],
         'C': [500, 700, 1000, 1400, 2000],
-        'gamma': [0.0003, 0.0006, 0.001, 0.002, 0.003,], #use scale instead
+        'gamma': [0.0003, 0.0006, 0.001, 0.002, 0.003, 'scale'], #use scale instead
         'class_weight': ['balanced'],
         'random_state': [0]
     }
