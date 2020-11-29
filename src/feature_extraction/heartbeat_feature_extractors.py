@@ -4,6 +4,10 @@ import pickle
 import os
 import sys
 
+from sklearn.preprocessing import MinMaxScaler
+
+from itertools import cycle
+
 from biosppy.signals import ecg
 
 from ..utils import path_project
@@ -19,20 +23,62 @@ class Heartbeat:
         self.heart_rate_ts = out['heart_rate_ts']
         self.heart_rate = out['heart_rate']
 
-def extract_all_features(feature_extractors):
-    extract_heartbeats = extract_heartbeat_features(feature_extractors)
+def extract_all_features(feature_extractors, ts_feature_extractors):
+    extract_heartbeats = extract_heartbeat_features(feature_extractors, ts_feature_extractors)
     return extract_features([extract_heartbeats])
 
-def extract_heartbeat_features(feature_extractors):
+def min_max_scale(train_df, test_df, columns=True):
+    all_features = pd.concat([train_df, test_df], axis=0)
+    if columns:
+        scaler = MinMaxScaler()
+        scaler.fit(all_features)
+        return pd.DataFrame(scaler.transform(train_df)), pd.DataFrame(scaler.transform(test_df))
+    
+    min_val = all_features.min().min()
+    max_val = all_features.max().max()
+    return (train_df - min_val)/(max_val - min_val), (test_df - min_val)/(max_val - min_val)
+
+def extract_heartbeat_features(feature_extractors, ts_feature_extractors):
     def aux(X_train, X_test):
         train_heartbeats, train_df, test_heartbeats, test_df = get_heartbeats(X_train, X_test)
 
-        print(train_df)
-        print(test_df)
+        train_df, test_df = min_max_scale(train_df, test_df)
 
         for extractor in feature_extractors:
-            train_df = pd.concat([train_df, extract(train_heartbeats, extractor)], axis=1)
-            test_df = pd.concat([test_df, extract(test_heartbeats, extractor)], axis=1)
+            train_features, test_features = min_max_scale(extract(train_heartbeats, extractor), extract(test_heartbeats, extractor))
+
+            train_df = pd.concat([train_df, train_features], axis=1, ignore_index=True)
+            test_df = pd.concat([test_df, test_features], axis=1, ignore_index=True)
+
+            print('train min:', train_features.min().min())
+            print('train max:', train_features.max().max())
+
+            print('test min:', test_features.min().min())
+            print('test max:', test_features.max().max())
+
+            print('global train min:', train_df.min().min())
+            print('global train max:', train_df.max().max())
+
+            print('global test min:', test_df.min().min())
+            print('global test max:', test_df.max().max())
+
+        for extractor in ts_feature_extractors:
+            train_features, test_features = min_max_scale(extract(train_heartbeats, extractor), extract(test_heartbeats, extractor), columns=False)
+
+            train_df = pd.concat([train_df, train_features], axis=1, ignore_index=True)
+            test_df = pd.concat([test_df, test_features], axis=1, ignore_index=True)
+
+            print('train min:', train_features.min().min())
+            print('train max:', train_features.max().max())
+
+            print('test min:', test_features.min().min())
+            print('test max:', test_features.max().max())
+
+            print('global train min:', train_df.min().min())
+            print('global train max:', train_df.max().max())
+
+            print('global test min:', test_df.min().min())
+            print('global test max:', test_df.max().max())
         
         return train_df, test_df
 
@@ -61,10 +107,10 @@ def get_heartbeats(X_train, X_test):
 def calc_heartbeats(df):
     heartbeats = []
     bounds = pd.DataFrame()
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         heartbeat = row[row.notna()]
         bounds = bounds.append(pd.DataFrame([[np.min(heartbeat), np.max(heartbeat)]]), ignore_index=True)
-        heartbeat = (heartbeat - np.min(heartbeat))/(np.max(heartbeat) - np.min(heartbeat))
+        # heartbeat = (heartbeat - np.min(heartbeat))/(np.max(heartbeat) - np.min(heartbeat))
         heartbeats.append(Heartbeat(ecg.ecg(heartbeat, sampling_rate=300., show=False)))
     return heartbeats, bounds
 
@@ -72,8 +118,7 @@ def extract(heartbeats, feature_extractor):
     df = pd.DataFrame()
     for heartbeat in heartbeats:
         features = feature_extractor(heartbeat)
-        df = df.append(pd.DataFrame([features]), ignore_index=True)
-
+        df = pd.concat([df, pd.DataFrame([features])], axis=0, ignore_index=True)
     print(df)
     return df
 

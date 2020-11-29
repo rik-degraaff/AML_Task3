@@ -13,6 +13,6 @@ def give_model():
         'random_state': [0]
     }
     cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=0)
-    model = GridSearchCV(SVC(), param_grid=param_grid, cv=cv, scoring='balanced_accuracy', return_train_score=True, n_jobs=-1, verbose=1)
+    model = GridSearchCV(SVC(), param_grid=param_grid, cv=cv, scoring='f1_micro', return_train_score=True, n_jobs=-1, verbose=1)
     
     return model
