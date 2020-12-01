@@ -117,7 +117,16 @@ def create_csv(df, name_path, name_file):
     os.makedirs(path, exist_ok=True)
     np.savetxt(path + name_file + ".csv", df, header='class0,class1,class2,class3,all_classes,min_class0,max_class0,min_class1,max_class1,min_class2,max_class2,min_class3,max_class3,per_10_class0,per_90_class0,per_10_class1,per_90_class1,per_10_class2,per_90_class2,per_10_class3,per_90_class3', comments='', delimiter=",", fmt=['%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f', '%1.10f','%1.10f', '%1.10f', '%1.10f', '%1.10f'])
 
-def create_sav(X_train, y_train, X_test, extension):
+def create_csv_processed(X_train, y_train, X_test, folder_name):
+    path = path_project + "data/" + folder_name
+    os.makedirs(path, exist_ok=True)
+
+    X_train.to_csv(path + '/X_train.csv')
+    y_train.to_csv(path + '/y_train.csv')
+    X_test.to_csv(path + '/X_test.csv')
+
+
+def create_sav(X_train, y_train, X_test, extension=None):
     path = path_project + "data/processed/"
     os.makedirs(path, exist_ok=True)
 
